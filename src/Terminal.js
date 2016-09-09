@@ -1,12 +1,20 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import Xterm from 'xterm';
-import 'xterm/addons/fit/fit';
-import 'xterm/addons/attach/attach';
-import 'xterm/addons/fullscreen/fullscreen';
+import 'xterm/addons/fit/fit.js';
+import 'xterm/addons/attach/attach.js';
+import 'xterm/addons/fullscreen/fullscreen.js';
 import io from 'socket.io-client';
 
 export default class Terminal extends React.Component {
+  static propTypes = {
+    socketURL: React.PropTypes.string.isRequired,
+    type: React.PropTypes.string,
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+    onError: React.PropTypes.func,
+    onClose: React.PropTypes.func
+  }
 
   constructor(props) {
     super(props);
@@ -17,7 +25,7 @@ export default class Terminal extends React.Component {
   }
 
   createSocket() {
-    const {onError} = this.props;
+    const {onError, onClose} = this.props;
     const socket = io({path: this.path, reconnection: false});
     socket.on('error', (err) => {
       console.error('terminal socket error:', err);
@@ -26,6 +34,7 @@ export default class Terminal extends React.Component {
     });
     socket.on('disconnect', () => {
       this.close();
+      onClose && onClose();
       if (parent.window) {
         parent.window.postMessage('terminal:destroy', window.location.origin);
       }

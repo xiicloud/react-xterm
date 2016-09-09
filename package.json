@@ -1,0 +1,24 @@
+{
+  "name": "@csphere/react-xterm",
+  "version": "1.0.0",
+  "description": "xterm component for React.js",
+  "main": "lib/Terminal.js",
+  "directories": {
+    "lib": "lib/"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf lib && babel src --out-dir lib",
+    "prepublish": "npm run build"
+  },
+  "author": "",
+  "peerDependencies": {
+    "react": "^15.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "socket.io-client": "^1.4.8",
+    "xterm": "^1.1.3"
+  }
+}

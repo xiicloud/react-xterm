@@ -1,8 +1,6 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import Xterm from 'xterm';
-import 'xterm/addons/fit/fit.js';
-import 'xterm/addons/attach/attach.js';
 import 'xterm/addons/fullscreen/fullscreen.js';
 import io from 'socket.io-client';
 
@@ -76,7 +74,6 @@ export default class Terminal extends React.Component {
     const size = this.viewport();
     socket.emit('auth', `terminal,${size.cols},${size.rows}`);
     term.open(terminalContainer);
-    term.fit();
     this.props.query && term.toggleFullscreen();
     term.write('\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n');
     term.on('data', (data) => {

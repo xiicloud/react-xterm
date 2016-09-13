@@ -7,36 +7,47 @@ import io from 'socket.io-client';
 export default class Terminal extends React.Component {
   static propTypes = {
     socketURL: React.PropTypes.string.isRequired,
-    type: React.PropTypes.string,
     width: React.PropTypes.number,
     height: React.PropTypes.number,
     onError: React.PropTypes.func,
-    onClose: React.PropTypes.func
+    onClose: React.PropTypes.func,
+    title: React.PropTypes.string,
+    initialEmit: React.PropTypes.array
   }
 
   constructor(props) {
     super(props);
     this.term = new Xterm({cursorBlink: true});
     this.path = props.socketURL || props.query.socketURL;
-    this.socket = this.createSocket();
+    this.socket = this.createSocket(this.path);
     this.handleResize = this.handleResize.bind(this);
+    this.width = props.width;
+    this.height = props.height;
+    this.isChange = false;
   }
 
-  createSocket() {
-    const {onError, onClose} = this.props;
-    const socket = io({path: this.path, reconnection: false});
+  createSocket(path) {
+    const {onError, onClose, initialEmit, title} = this.props;
+    const term = this.term;
+    const socket = io({path, reconnection: false, forceNew: true});
+    socket.on('connect', () => {
+      socket.emit(initialEmit[0], initialEmit[1]);
+      term.write(title);
+    });
     socket.on('error', (err) => {
-      console.error('terminal socket error:', err);
+      term.write(`\x1b[31mError:${err}\x1b[m\r\n`);
       onError && onError();
-      this.close();
     });
     socket.on('disconnect', () => {
-      this.close();
-      onClose && onClose();
-      if (parent.window) {
-        parent.window.postMessage('terminal:destroy', window.location.origin);
+      if (!this.isChange) {
+        onClose && onClose();
       }
-      window.close();
+    });
+    socket.on('data', (data) => {
+      term.write(data);
+    });
+    term.on('data', (data) => {
+      socket.emit('data', data);
     });
     return socket;
   }
@@ -54,8 +65,8 @@ export default class Terminal extends React.Component {
 
   viewport() {
     const terminalContainer = findDOMNode(this);
-    const width = this.props.width || (terminalContainer ? terminalContainer.clientWidth : 0);
-    const height = this.props.height || (terminalContainer ? terminalContainer.clientHeight : 0);
+    const width = this.width || (terminalContainer ? terminalContainer.clientWidth : 0);
+    const height = this.height || (terminalContainer ? terminalContainer.clientHeight : 0);
     return {
       cols: parseInt(width / 7, 10),
       rows: parseInt(height / 14, 10)
@@ -63,33 +74,42 @@ export default class Terminal extends React.Component {
   }
 
   componentWillMount() {
+    const onClose = this.props;
     if (!this.path) {
+      onClose && onClose();
       this.close();
     }
   }
 
   componentDidMount() {
     const terminalContainer = findDOMNode(this);
-    const {term, socket} = this;
-    const size = this.viewport();
-    socket.emit('auth', `terminal,${size.cols},${size.rows}`);
+    const {term} = this;
     term.open(terminalContainer);
     this.props.query && term.toggleFullscreen();
-    term.write('\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n');
-    term.on('data', (data) => {
-      socket.emit('data', data);
-    });
-
-    socket.on('data', (data) => {
-      term.write(data);
-    });
-
+    this.handleResize();
     window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
     this.close();
     window.removeEventListener('resize', this.handleResize);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {socketURL, width, height} = this.props;
+    if (socketURL !== nextProps.socketURL) {
+      this.isChange = true;
+      this.term.eraseInDisplay([2]);
+      this.socket.close();
+      this.socket = this.createSocket(nextProps.socketURL);
+      this.socket.emit('data', '\f');
+      this.handleResize();
+    }
+    if (width !== nextProps.width || height !== nextProps.height) {
+      this.width = nextProps.width;
+      this.height = nextProps.height;
+      this.handleResize();
+    }
   }
 
   render() {
@@ -101,5 +121,7 @@ export default class Terminal extends React.Component {
 
 Terminal.defaultProps = {
   width: 0,
-  height: 0
+  height: 0,
+  title: '\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n',
+  initialEmit: ['auth', 'terminal,50,50']
 };

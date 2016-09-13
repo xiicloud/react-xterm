@@ -68,8 +68,8 @@ export default class Terminal extends React.Component {
     const width = this.width || (terminalContainer ? terminalContainer.clientWidth : 0);
     const height = this.height || (terminalContainer ? terminalContainer.clientHeight : 0);
     return {
-      cols: parseInt(width / 7, 10),
-      rows: parseInt(height / 14, 10)
+      cols: parseInt(width / 9, 10),
+      rows: parseInt(height / 20, 10)
     };
   }
 
@@ -123,6 +123,6 @@ Terminal.defaultProps = {
   width: 0,
   height: 0,
   title: '\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n',
-  initialEmit: ['auth', 'terminal,50,50'],
+  initialEmit: ['auth', 'terminal,50,20'],
   fullscreen: false
 };

@@ -1,6 +1,6 @@
 {
   "name": "@csphere/react-xterm",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "xterm component for React.js",
   "main": "lib/Terminal.js",
   "directories": {

@@ -66,10 +66,11 @@ export default class Terminal extends React.Component {
   viewport() {
     const terminalContainer = findDOMNode(this);
     const width = this.width || (terminalContainer ? terminalContainer.querySelector('.terminal').clientWidth : 0);
-    const height = this.height || (terminalContainer ? terminalContainer.clientHeight : 0);
+    const terminalHeight = terminalContainer ? terminalContainer.clientHeight : 0;
+    const height = this.height || (this.props.fullscreen ? document.documentElement.clientHeight : terminalHeight);
     return {
       cols: parseInt(width / 7, 10),
-      rows: parseInt(height / 20, 10)
+      rows: parseInt(height / 19, 10)
     };
   }
 

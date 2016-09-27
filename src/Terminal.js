@@ -101,10 +101,9 @@ export default class Terminal extends React.Component {
     const {socketURL, width, height} = this.props;
     if (socketURL !== nextProps.socketURL) {
       this.isChange = true;
-      this.term.eraseInDisplay([2]);
+      this.term.reset();
       this.socket.close();
       this.socket = this.createSocket(nextProps.socketURL);
-      this.socket.emit('data', '\f');
       this.handleResize();
     }
     if (width !== nextProps.width || height !== nextProps.height) {

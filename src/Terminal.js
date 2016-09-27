@@ -30,6 +30,7 @@ export default class Terminal extends React.Component {
     const {onError, onClose, initialEmit, title} = this.props;
     const term = this.term;
     const socket = io({path, reconnection: false, forceNew: true});
+    this.isChange = false;
     socket.on('connect', () => {
       socket.emit(initialEmit[0], initialEmit[1]);
       term.write(title);

@@ -13,7 +13,8 @@ export default class Terminal extends React.Component {
     onClose: React.PropTypes.func,
     title: React.PropTypes.string,
     initialEmit: React.PropTypes.array,
-    fullscreen: React.PropTypes.bool
+    fullscreen: React.PropTypes.bool,
+    fontSize: React.PropTypes.number
   }
 
   constructor(props) {
@@ -69,9 +70,11 @@ export default class Terminal extends React.Component {
     const width = this.width || (terminalContainer ? terminalContainer.querySelector('.terminal').clientWidth : 0);
     const terminalHeight = terminalContainer ? terminalContainer.clientHeight : 0;
     const height = this.height || (this.props.fullscreen ? document.documentElement.clientHeight : terminalHeight);
+    const fontSize = this.props.fontSize;
+
     return {
       cols: parseInt(width / 7, 10),
-      rows: parseInt(height / 19, 10)
+      rows: parseInt((height - fontSize) / fontSize, 10)
     };
   }
 
@@ -125,5 +128,6 @@ Terminal.defaultProps = {
   height: 0,
   title: '\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n',
   initialEmit: ['auth', 'terminal,50,20'],
-  fullscreen: false
+  fullscreen: false,
+  fontSize: 14
 };

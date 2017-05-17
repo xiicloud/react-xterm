@@ -1,8 +1,9 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import Xterm from 'xterm';
-import 'xterm/addons/fullscreen/fullscreen.js';
 import io from 'socket.io-client/socket.io.js';
+
+Xterm.loadAddon('fullscreen');
 
 export default class Terminal extends React.Component {
   static propTypes = {

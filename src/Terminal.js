@@ -1,20 +1,18 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
 import Xterm from 'xterm/dist/xterm.js';
+import 'xterm/dist/addons/fit/fit.js';
 import 'xterm/dist/addons/fullscreen/fullscreen.js';
 import io from 'socket.io-client/socket.io.js';
 
 export default class Terminal extends React.Component {
   static propTypes = {
     socketURL: React.PropTypes.string.isRequired,
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
     onError: React.PropTypes.func,
     onClose: React.PropTypes.func,
     title: React.PropTypes.string,
     initialEmit: React.PropTypes.array,
-    fullscreen: React.PropTypes.bool,
-    fontSize: React.PropTypes.number
+    fullscreen: React.PropTypes.bool
   }
 
   constructor(props) {
@@ -51,6 +49,9 @@ export default class Terminal extends React.Component {
     term.on('data', (data) => {
       socket.emit('data', data);
     });
+    term.on('resize', ({cols, rows}) => {
+      socket.emit('resize', `${cols},${rows}`);
+    })
     return socket;
   }
 
@@ -60,22 +61,7 @@ export default class Terminal extends React.Component {
   }
 
   handleResize() {
-    const size = this.viewport();
-    this.socket.emit('resize', `${size.cols},${size.rows}`,
-      () => this.term.resize(size.cols, size.rows));
-  }
-
-  viewport() {
-    const terminalContainer = findDOMNode(this);
-    const width = this.width || (terminalContainer ? terminalContainer.querySelector('.terminal').clientWidth : 0);
-    const terminalHeight = terminalContainer ? terminalContainer.clientHeight : 0;
-    const height = this.height || (this.props.fullscreen ? document.documentElement.clientHeight : terminalHeight);
-    const fontSize = this.props.fontSize;
-
-    return {
-      cols: parseInt(width / 7, 10),
-      rows: parseInt((height - fontSize) / fontSize, 10)
-    };
+    this.term.fit();
   }
 
   componentWillMount() {
@@ -109,11 +95,6 @@ export default class Terminal extends React.Component {
       this.socket = this.createSocket(nextProps.socketURL);
       this.handleResize();
     }
-    if (width !== nextProps.width || height !== nextProps.height) {
-      this.width = nextProps.width;
-      this.height = nextProps.height;
-      this.handleResize();
-    }
   }
 
   render() {
@@ -124,10 +105,7 @@ export default class Terminal extends React.Component {
 }
 
 Terminal.defaultProps = {
-  width: 0,
-  height: 0,
   title: '\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n',
   initialEmit: ['auth', 'terminal,50,20'],
   fullscreen: false,
-  fontSize: 14
 };

@@ -1,12 +1,13 @@
 {
   "name": "@csphere/react-xterm",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "xterm component for React.js",
   "main": "lib/Terminal.js",
   "directories": {
     "lib": "lib/"
   },
   "scripts": {
+    "start": "babel src --out-dir lib --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf lib && babel src --out-dir lib",
     "prepublish": "npm run build"

@@ -23,6 +23,14 @@ export default class Terminal extends React.Component {
     this.width = props.width;
     this.height = props.height;
     this.isChange = false;
+    this.term.on('data', (data) => {
+      this.socket.emit('data', data);
+    });
+    this.term.on('resize', ({cols, rows}) => {
+      this.cols = cols;
+      this.rows = rows;
+      this.socket.emit('resize', `${cols},${rows}`);
+    })
   }
 
   createSocket(path) {
@@ -46,12 +54,6 @@ export default class Terminal extends React.Component {
     socket.on('data', (data) => {
       term.write(data);
     });
-    term.on('data', (data) => {
-      socket.emit('data', data);
-    });
-    term.on('resize', ({cols, rows}) => {
-      socket.emit('resize', `${cols},${rows}`);
-    })
     return socket;
   }
 
@@ -93,7 +95,8 @@ export default class Terminal extends React.Component {
       this.term.reset();
       this.socket.close();
       this.socket = this.createSocket(nextProps.socketURL);
-      this.handleResize();
+      this.socket.emit('resize', `${this.cols},${this.rows}`);
+      this.term.focus();
     }
   }
 

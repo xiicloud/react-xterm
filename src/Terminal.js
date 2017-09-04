@@ -64,7 +64,7 @@ export default class Terminal extends React.Component {
     if (socketURL !== nextProps.socketURL) {
       this.socket.close();
       this.term.reset();
-      this.createSocket(this.props.socketURL);
+      this.createSocket(nextProps.socketURL);
     }
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import {findDOMNode} from 'react-dom';
+import PropTypes from 'prop-types';
 import Xterm from 'xterm/dist/xterm.js';
 import 'xterm/dist/addons/fit/fit.js';
 import 'xterm/dist/addons/fullscreen/fullscreen.js';
@@ -7,12 +8,12 @@ import io from 'socket.io-client/socket.io.js';
 
 export default class Terminal extends React.Component {
   static propTypes = {
-    socketURL: React.PropTypes.string.isRequired,
-    onError: React.PropTypes.func,
-    onClose: React.PropTypes.func,
-    title: React.PropTypes.string,
-    initialEmit: React.PropTypes.array,
-    fullscreen: React.PropTypes.bool
+    socketURL: PropTypes.string.isRequired,
+    onError: PropTypes.func,
+    onClose: PropTypes.func,
+    title: PropTypes.string,
+    initialEmit: PropTypes.array,
+    fullscreen: PropTypes.bool
   }
 
   constructor(props) {

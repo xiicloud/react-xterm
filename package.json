@@ -1,6 +1,6 @@
 {
   "name": "@csphere/react-xterm",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "xterm component for React.js",
   "main": "lib/Terminal.js",
   "directories": {
@@ -17,6 +17,7 @@
     "react": "^15.0.0"
   },
   "dependencies": {
+    "prop-types": "^15.6.0",
     "socket.io-client": "1.2.1",
     "xterm": "^2.8.1"
   },

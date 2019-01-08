@@ -76,5 +76,5 @@ export default class Terminal extends React.Component {
 }
 
 Terminal.defaultProps = {
-  title: '\x1b[32mWelcome to use cSphere online terminal!\x1b[m\r\n'
+  title: '\x1b[32mWelcome to use online terminal!\x1b[m\r\n'
 };

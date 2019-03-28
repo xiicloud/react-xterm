@@ -35,13 +35,16 @@ export default class Terminal extends React.Component {
     }
   }
 
-  createSocket(socketURL: string) {
+  createSocket(socketURL: string, onClose: Function) {
     this.socket = new WebSocket(`${socketURL}?dim=${this.cols}|${this.rows}`);
     this.socket.onopen = () => {
       this.term.write(this.props.title);
       this.term.csphereAttach(this.socket);
       this.term.fit();
-    }
+    };
+    this.socket.onclose = () => {
+      onClose();
+    };
   }
 
   componentDidMount() {
@@ -50,12 +53,12 @@ export default class Terminal extends React.Component {
     const {cols, rows} = this.term.proposeGeometry();
     this.cols = cols;
     this.rows = rows;
-    this.createSocket(this.props.socketURL);
+    this.createSocket(this.props.socketURL, this.props.onClose);
     window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
-    this.close()
+    this.close();
     window.removeEventListener('resize', this.handleResize);
   }
 
@@ -64,7 +67,7 @@ export default class Terminal extends React.Component {
     if (socketURL !== nextProps.socketURL) {
       this.socket.close();
       this.term.reset();
-      this.createSocket(nextProps.socketURL);
+      this.createSocket(nextProps.socketURL, nextProps.onClose);
     }
   }
 
